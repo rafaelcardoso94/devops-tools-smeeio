@@ -4,5 +4,5 @@ deployment:
     webhook: https://smee.io/J1kz4h4wrwerew #https://smee.io/new
     image:
       address: nsh1acreaus1ncacrhml001.azurecr.io
-      repository: wallet-arbi/tools-smeeio
-      tag: e6b1686
+      repository: your-registry/smee-io
+      tag: latest
