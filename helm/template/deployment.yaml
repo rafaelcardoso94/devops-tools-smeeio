@@ -1,0 +1,49 @@
+{{- $s := index .Values.deployment "tools-smeeio" -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: smee-client
+  namespace: argocd
+spec:
+  replicas: {{ $s.replicas }}
+  selector:
+    matchLabels:
+      app: smee-client
+  template:
+    metadata:
+      labels:
+        app: smee-client
+    spec:
+      nodeSelector:
+        node-type: tools  
+      containers:
+        - name: smee-client
+          image: "{{ $s.image.address }}/{{ $s.image.repository }}:{{ $s.image.tag }}"
+          args:
+            - "--url={{ $s.webhook }}"
+            - "--target=http://argocd-server.argocd.svc.cluster.local:80/api/webhook"
+          livenessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 10
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+                - pgrep
+                - node
+            initialDelaySeconds: 5
+            periodSeconds: 15
+            timeoutSeconds: 3
+            failureThreshold: 2
+          resources:
+            requests:
+              cpu: 50m
+              memory: 64Mi
+            limits:
+              cpu: 200m
+              memory: 128Mi
